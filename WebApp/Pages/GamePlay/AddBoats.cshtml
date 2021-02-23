@@ -1,0 +1,113 @@
+@page
+@using Domain
+@using Domain.Enums
+@using GameBrain
+@model WebApp.Pages.GamePlay.AddBoats
+
+
+@functions
+{
+    string GetCellContent(CellState[,] board, int x, int y)
+    {
+        var cell = board[x, y];
+        var res = "";
+        switch (cell)
+        {
+            case CellState.B:
+                res = "B";
+                break;
+            case CellState.O:
+                res = "0";
+                break;
+            case CellState.M:
+                res = "M";
+                break;
+            case CellState.X:
+                res = "X";
+                break;
+            case CellState.Empty:
+                res = "&nbsp;";
+                break;
+        }
+        return  res;
+    }
+    
+    string GetCellClass((int x, int y) coordinates)
+    {
+        if (Model.CurrentBoatCoordinates != null && Model.CurrentBoatCoordinates.Contains((coordinates.x,coordinates.y)))
+        {
+            return "bg-danger";
+        }
+        return "";
+    }
+    
+    string GetMessage(bool isOldBoat,GameOption gameOptions)
+    {
+
+        if (isOldBoat)
+        {
+            return "There already is a boat at this coordinate!";
+        }
+
+        if (gameOptions.EBoatsCanTouch == EBoatsCanTouch.Corners)
+        {
+            return "Only the boats corners can touch!";
+        }
+        return "The boats can not touch in any way!";
+    }
+}
+
+@if (Model.IsTouching || Model.IsOldBoat)
+{
+    <script type="text/javascript">
+        alert("@GetMessage(Model.IsOldBoat, Model.Game!.GameOption)");
+    </script>
+    
+}
+
+<div class="row">
+    <div class="button-container">
+        <button class="btn btn-primary" onclick="window.location.href = '?id=@Model.Game!.GameId&auto=@true'">Automatically place boats</button>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-1">
+            <table>
+                <tr>
+                    <td></td>
+                    <td><a asp-route-id="@Model.Game?.GameId" asp-route-boatId="@Model.BoatId" asp-route-boatNr="@Model.BoatNr" asp-route-playerId="@Model.CurrentPlayer.PlayerId" asp-route-dir="up">⬆️</a></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td><a asp-route-id="@Model.Game?.GameId" asp-route-boatId="@Model.BoatId" asp-route-boatNr="@Model.BoatNr" asp-route-playerId="@Model.CurrentPlayer.PlayerId" asp-route-dir="left">⬅</a>️</td>
+                    <td><a asp-route-id="@Model.Game?.GameId" asp-route-boatId="@Model.BoatId" asp-route-boatNr="@Model.BoatNr" asp-route-playerId="@Model.CurrentPlayer.PlayerId" asp-route-dir="rotate">🔄</a></td>
+                    <td><a asp-route-id="@Model.Game?.GameId" asp-route-boatId="@Model.BoatId" asp-route-boatNr="@Model.BoatNr" asp-route-playerId="@Model.CurrentPlayer.PlayerId" asp-route-dir="right">➡️</a></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><a asp-route-id="@Model.Game?.GameId" asp-route-boatId="@Model.BoatId" asp-route-boatNr="@Model.BoatNr" asp-route-playerId="@Model.CurrentPlayer.PlayerId" asp-route-dir="down">⬇</a>️</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td colspan="3"><a asp-route-boatId="@Model.BoatId" asp-route-boatNr="@Model.BoatNr" asp-route-dir="place" asp-route-id="@Model.Game?.GameId" asp-route-playerId="@Model.CurrentPlayer.PlayerId">🆗</a></td>
+                </tr>
+            </table>
+        </div>
+    <div class="gameBoard">
+        <div class="boardHeader">@Model.CurrentPlayer.Name place you boats!</div>
+        <table class="table table-bordered">
+            @for (var y = 0; y < AddBoats.BoardHeight; y++)
+            {
+                <tr>
+                    @for (var x = 0; x < AddBoats.BoardWidth; x++)
+                    {
+                        <td class=@Html.Raw(GetCellClass((x,y)))>
+                            <div class="gameBoard-data-cell">@Html.Raw(GetCellContent(@Model.Board!,x,y))</div>
+                        </td>
+                    }
+                </tr>
+            }
+        </table>
+    </div>
+</div>

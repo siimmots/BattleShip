@@ -1,0 +1,142 @@
+@page
+@using Domain
+@using Domain.Enums
+@using GameBrain
+@model WebApp.Pages.GamePlay.Index
+
+
+@functions
+{
+    
+    string getCellContent(CellState cell)
+    {
+        var res = "";
+        switch (cell)
+        {
+            case CellState.O:
+                res = "0";
+                break;
+            case CellState.M:
+                res = "M";
+                break;
+            case CellState.X:
+                res = "X";
+                break;
+            case CellState.Empty:
+                res = "&nbsp;";
+                break;
+        }
+        return  res;
+    }
+    
+    string GetCellClass(CellState cellState)
+    {
+        return cellState == CellState.Empty ? "gameBoard-cell-active" : "bg-danger";
+    }
+
+    static Player GetCurrentPlayer(BattleShip game,Game dbGame)
+    {
+        return game.NextMoveByPlayer1 ? dbGame.PlayerA : dbGame.PlayerB;
+    }
+    
+    
+    string GetMessage(GameOption gameOptions,Game game, bool? isHit, bool? isWin)
+    {
+        string player;
+        
+        
+        if (gameOptions.ENextMoveAfterHit == ENextMoveAfterHit.SamePlayer)
+        {
+            player = game.NextMoveByPlayer1 ? game.PlayerA.Name : game.PlayerB.Name;
+        }
+        else
+        {
+            player = game.NextMoveByPlayer1 ? game.PlayerA.Name : game.PlayerB.Name; 
+        }
+
+        if (isWin == true)
+        {
+            return $"VICTORY! You win the game, {player}! Press OK to return to the Main menu!";
+        }
+        
+        if (isHit == true)
+        {
+            if (gameOptions.ENextMoveAfterHit == ENextMoveAfterHit.SamePlayer)
+            {
+                return $"HIT! It is you turn again, {player}!";
+            }
+            return $"HIT! It is you turn {player}!";
+        }
+        
+        return $"MISS! It is your turn, {player}!";
+        
+    }
+}
+
+
+@if (Model.IsHit != null)
+{
+    <script type="text/javascript">
+        alert("@GetMessage(Model.GameOptions!,Model.Game!,Model.IsHit, Model.IsWin)");
+    </script>
+}
+
+@if (Model.IsWin == true)
+{
+    <script type="text/javascript">
+        location.replace("../Index");
+    </script>
+}
+
+@if (Model.CanUndo == false)
+{
+    <script type="text/javascript">
+        alert("You have no more moves to undo!")
+    </script>
+}
+
+<div class="text-center">
+    <h1 class="display-4">@Model.Game!.Description</h1>
+</div>
+<div class="row">
+    <div class="button-container">
+        <button class="btn btn-primary" onclick="window.location.href = '?id=@Model.Game!.GameId&undo=true&isHit=@Model.IsHit'">Undo last move</button>
+    </div>
+</div>
+<div class="row">
+    <div class="gameBoard">
+        <div class="boardHeader">It's @GetCurrentPlayer(@Model.BattleShip, @Model.Game!).Name 's turn to place a bomb
+        </div>
+        <table class="table table-bordered">
+            @for (var y = 0; y < Index.BoardHeight; y++)
+            {
+                <tr>
+                    @for (var x = 0; x < Index.BoardWidth; x++)
+                    {
+                        <td class="@GetCellClass(@Model.BattleShip.GetCell(x, y, @Model.Game!, @Model.BattleShip.NextMoveByPlayer1 ? @Model.Player1BombBoard : @Model.Player2BombBoard))"
+                            onclick="window.location.href = '?x=@x&y=@y&id=@Model.Game?.GameId'" style="cursor: pointer">
+                            <div class="gameBoard-data-cell">@Html.Raw(getCellContent((@Model.BattleShip.GetCell(x, y, @Model.Game!,
+                                                                 @Model.BattleShip.NextMoveByPlayer1 ? @Model.Player1BombBoard : @Model.Player2BombBoard))))</div>
+                        </td>
+                    }
+                </tr>
+            }
+        </table>
+    </div>
+    <div class="gameBoard">
+        <div class="boardHeader">These are @GetCurrentPlayer(@Model.BattleShip, @Model.Game!).Name 's boats</div>
+        <table class="table table-bordered">
+            @for (var y = 0; y < Index.BoardHeight; y++)
+            {
+                <tr>
+                    @for (var x = 0; x < Index.BoardWidth; x++)
+                    {
+                        <td class="@GetCellClass(@Model.BattleShip.GetCell(x, y, @Model.Game!, null))">
+                            <div class="gameBoard-data-cell">@Html.Raw(getCellContent((@Model.BattleShip.GetCell(x, y, @Model.Game!, null))))</div>
+                        </td>
+                    }
+                </tr>
+            }
+        </table>
+    </div>
+</div>

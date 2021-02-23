@@ -1,0 +1,63 @@
+@page
+@model WebApp.Pages.Games.CreateModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>Game</h4>
+<hr/>
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Description" class="control-label">Game name</label>
+                <input type="text" asp-for="Description" class="form-control"/>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlayerAName" class="control-label">Player 1 Name</label>
+                <input type="text" asp-for="PlayerAName" class="form-control"/>
+                <span asp-validation-for="PlayerAName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlayerBName" class="control-label">Player 2 Name</label>
+                <input type="text" asp-for="PlayerBName" class="form-control"/>
+                <span asp-validation-for="PlayerBName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BoatsCanTouch" class="control-label">Can the boats touch each other?</label>
+                <select asp-for="BoatsCanTouch" class ="form-control" asp-items="ViewBag.BoatTouchOptions"></select>
+                <span asp-validation-for="BoatsCanTouch" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="NextMoveAfterHit" class="control-label">Who has the next turn after a boat hit?</label>
+                <select asp-for="NextMoveAfterHit" class ="form-control" asp-items="ViewBag.MoveAfterHitOptions"></select>
+                <span asp-validation-for="NextMoveAfterHit" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BoardWidth" class="control-label">Board width</label>
+                <select asp-for="BoardWidth" class ="form-control" asp-items="ViewBag.BoardSizes"></select>
+                <span asp-validation-for="BoardWidth" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BoardHeight" class="control-label">Board height</label>
+                <select asp-for="BoardHeight" class ="form-control" asp-items="ViewBag.BoardSizes"></select>
+                <span asp-validation-for="BoardHeight" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-page="../Index">Return to Main menu</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
