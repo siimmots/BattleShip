@@ -16,7 +16,7 @@ dotnet ef database drop  --project DAL --startup-project ConsoleApp
 ~~~
 
 
-##Project images
+## Project images
 
 **Main Menu**
 
